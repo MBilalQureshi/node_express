@@ -11,10 +11,22 @@ const guitars = [
     {id: 3, make: 'Ibanez', model: 'RG'}
 ]
 
+// /guitars will be the route for all guitars
 guitarRoutes.get('/', (req,res)=>{
     res.send(guitars);
-})
+});
 
-guitarRoutes.get('/1', (req,res)=>{
-    res.send(guitars[0]);
-})
+//routes paramerters
+guitarRoutes.get('/:id', (req,res)=>{
+    const id =  parseInt(req.params.id, 10);
+    const guitar = guitars.find(g => g.id === id);
+    
+    //handle if id or guitar is not found
+    if(!guitar){
+        res.send(404);
+    }
+    else{
+        res.send(guitar);
+    }
+    
+});
