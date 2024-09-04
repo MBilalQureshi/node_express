@@ -1,5 +1,5 @@
 import express from 'express';
-import {guitarRoutes} from './guitars/index.js';
+import {guitarRoutes} from './guitars/routes.js';
 
 const app = express();
 
