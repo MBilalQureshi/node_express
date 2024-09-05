@@ -8,7 +8,7 @@ const guitars = [
     {id: 6, make: 'Gibson', model: 'Custom 24'}
 ]
 
-// As the task perofmed with MongoDB will be using Async/Await use it for static data as well for consistency
+// As the task perofmed with MongoDB will be using Async/Await, use it for static data as well for consistency
 export function getAll(){
     return Promise.resolve(guitars);
     // return new Promise((resolve, reject) => {

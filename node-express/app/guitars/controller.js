@@ -1,8 +1,11 @@
 import { getAll, getById, getByMake } from "./model.js";
+import { view } from "./view.js";
+
 // List all guitars
 export async function listGuitars(req,res){
     const guitars = await getAll();
-    res.send(guitars);
+    // res.send(guitars); // this will send the data as it is is JSON format
+    res.send(view('list', {guitars} )); // this will send the data in HTML format
 }
 
 // List guitar based on id or guitars based on make
