@@ -1,5 +1,7 @@
 import express from 'express';
 import {guitarRoutes} from './guitars/routes.js';
+import uploadRoutes from './multer_csv/route/uploadRoute.js';
+import readCsvRoutes from './multer_csv/route/readCsvRoute.js';
 
 const app = express();
 
@@ -8,6 +10,9 @@ app.use('/guitars', guitarRoutes);
 app.get('/', (req, res)=>{
     res.send('Home Page')
 })
+// Upload routes
+app.use('/', uploadRoutes);
+app.use('/', readCsvRoutes);
 // simple addition using app.get
 // app.get('/add/:num1/:num2',(req,res)=>{
 app.get('/add/:num1-:num2',(req,res)=>{
