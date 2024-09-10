@@ -13,4 +13,5 @@ router.delete("/delete/user/:username", deleteUser);
 //Post Routes
 router.post("/create/post", createPost);
 router.get("/get/posts", getAllPosts);
+
 export default router;
