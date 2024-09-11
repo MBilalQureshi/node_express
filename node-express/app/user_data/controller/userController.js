@@ -1,14 +1,60 @@
 import { User, Post } from '../model/user.js';
+import validator from 'validator';
 
 // Create a new user
 export const createUser = async (req, res) => {
-    const { username, email, name, age, gender, password } = req.body;
+    let { username, email, name, age, gender, password } = req.body;
+
+    // Trim spaces and remove extra spaces between words
+    const trimAndRemoveExtraSpaces = (str) => {
+        return validator.trim(str).replace(/\s+/g, '');
+    };
+    // Destructuring assignment and mapping to trim and remove extra spaces
+    [username, email, age, password] = [username, email, age.toString(), password].map(trimAndRemoveExtraSpaces); 
+
+    // Check if required fields are present
+    const requiredFields = { username, email, name, age, gender, password };
+    for (const [key, value] of Object.entries(requiredFields)) {
+        if (!value && key !== 'age') {
+            return res.status(400).json({ message: `${key.charAt(0).toUpperCase() + key.slice(1)} is required` });
+        }
+    }
+
+    // Validate name to contain only alphabetic characters and spaces
+    const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
+    if (!nameRegex.test(name)) {
+        return res.status(400).json({ message: 'Name must contain only alphabetic characters and spaces' });
+    }
+    // Capitalize the first character of each part of the name
+    const capitalizeName = (str) => {
+        return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    };
+    name = capitalizeName(name);
+
+    // validate email
+    if(!validator.isEmail(email)){
+        return res.status(400).json({ message: 'Invalid email' });
+    }
+
+    // Validate age
+    if (age.length > 0 && !validator.isInt(age, { min: 1, max: 100 })) {
+        return res.status(400).json({ message: 'Age must be a number between 1 and 100' });
+    }
+
+    // Convert age back to number if it is not empty
+    if(age.length > 0){
+        age = parseInt(age, 10);
+    }
+
     try{
         const newUser = new User({ username, email, name, age, gender, password });
         await newUser.save();
         res.status(201).json(newUser);
     }catch(err){
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ 
+            message: `An error occurred while creating the user. Please try again later.${err.message}`,
+            status: false,
+        });
     }
 }
 
