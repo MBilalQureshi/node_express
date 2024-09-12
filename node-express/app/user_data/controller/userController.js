@@ -1,6 +1,7 @@
 import { User, Post } from '../model/user.js';
 import validator from 'validator';
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 // Trim spaces and remove extra spaces between words
 const trimAndRemoveExtraSpaces = (str) => {
@@ -43,6 +44,10 @@ const validateEmail = (email, res) => {
         res.status(400).json({ message: 'Invalid email' });
         return false;
     }
+    if (email.length > 30) {
+        res.status(400).json({ message: 'Email must be at most 30 characters long' });
+        return false;
+    }
     return true;
 };
 
@@ -65,6 +70,11 @@ const convertAgeToNumber = (age) => {
 
 // Function to validate username
 const validateUsername = (username, res) => {
+    const usernameRegex = /^[a-zA-Z0-9._]+$/;
+    if (!usernameRegex.test(username)) {
+        res.status(400).json({ message: 'Username can only contain alphanumeric characters, dots, and underscores' });
+        return false;
+    }
     if (username.length > 15) {
         res.status(400).json({ message: 'Username must be at most 15 characters long' });
         return false;
@@ -130,12 +140,15 @@ export const createUser = async (req, res) => {
     }
 
     try{
-        const newUser = new User({ username, email, name, age, gender, password });
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const newUser = new User({ username, email, name, age, gender, password: hashedPassword });
         await newUser.save();
         res.status(201).json(newUser);
     }catch(err){
-        res.status(500).json({ 
-            message: `An error occurred while creating the user. Please try again later.${err.message}`,
+        res.status(500).json({
+            message: `An error occurred while creating the user. Please try again later.`,
             status: false,
         });
     }
@@ -153,7 +166,7 @@ export const getUser = async (req, res) => {
             res.status(404).json({ message: 'User not found' });
         }
     }catch(err){
-        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.${err.message}` });
+        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.` });
     }
 }
 
@@ -167,7 +180,7 @@ export const getAllUsers = async (_, res) => {
             res.status(404).json({ message: 'No users found' });
         }
     }catch(err){
-        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.${err.message}`});
+        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.`});
     }
 }
 
@@ -216,7 +229,7 @@ export const updateUser = async (req, res) => {
     if (!validatePassword(password, res)) {
         return;
     }
-    
+
     try {
         //Id is an ObjectId
         const objectId = mongoose.Types.ObjectId.createFromHexString(id);
@@ -228,7 +241,7 @@ export const updateUser = async (req, res) => {
             res.status(404).json({ message: 'User not found' });
         }
     } catch (err) {
-        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.${err.message}` });
+        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.` });
     }
 };
 
@@ -244,7 +257,7 @@ export const deleteUser = async (req, res) => {
             res.status(404).json({ message: 'User not found' });
         }
     }catch(err){
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.` });
     }
 }
 
@@ -265,7 +278,7 @@ export const createPost = async (req, res) => {
         res.status(201).json(newPost);
 
     }catch(err){
-        res.status(500).json({message: err.message});
+        res.status(500).json({message: `An error occurred while creating the user. Please try again later.`});
     }
 }
 
@@ -282,6 +295,6 @@ export const getAllPosts = async (_, res) => {
             res.status(404).json({ message: 'No posts found' });
         }
     }catch(err){
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: `An error occurred while creating the user. Please try again later.` });
     }
 }
