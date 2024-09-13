@@ -2,6 +2,13 @@ import { User, Post } from '../model/user.js';
 import validator from 'validator';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { ACCESS_TOKEN_SECRET } from '../../config/config.js';
+
+// Function to generate access token
+const generateAccessToken = (user) => {
+    return jwt.sign({ id: user._id, username: user.username }, ACCESS_TOKEN_SECRET, {expiresIn: '1h'});
+};
 
 // Trim spaces and remove extra spaces between words
 const trimAndRemoveExtraSpaces = (str) => {
@@ -97,6 +104,27 @@ const validatePassword = (password, res) => {
     return true;
 };
 
+
+// User Login
+export const login = async (req, res)=> {
+    const { username, password } = req.body;
+    try{
+        //validate username
+        const user = await User.findOne({ username});
+        if(!user) return res.status(404).json({ message: 'Invalid username or password' });
+        
+        // validate password
+        const validPassword = bcrypt.compare(password, user.password);
+        if(!validPassword) return res.status(404).json({ message: 'Invalid username or password' });
+
+        // Generate access token
+        const accessToken = generateAccessToken(user);
+        res.status(200).json({ accessToken });
+
+    }catch(err){
+        res.status(500).json({ message: 'Invalid username or password' });
+    }
+};
 // Create a new user
 export const createUser = async (req, res) => {
     let { username, email, name, age, gender, password } = req.body;
@@ -231,10 +259,18 @@ export const updateUser = async (req, res) => {
     }
 
     try {
+        // Ensure id is a valid ObjectId string
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+        
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         //Id is an ObjectId
         const objectId = mongoose.Types.ObjectId.createFromHexString(id);
-        const updateUser = await User.findOneAndUpdate({ _id: objectId }, { username, email, name, age, gender, password }, { new: true });
-        console.log(updateUser);
+        const updateUser = await User.findOneAndUpdate({ _id: objectId }, { username, email, name, age, gender, password: hashedPassword }, { new: true });
         if (updateUser) {
             res.status(200).json(updateUser);
         } else {
