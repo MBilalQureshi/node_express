@@ -7,6 +7,9 @@ import readCsvRoutes from './multer_csv/route/readCsvRoute.js';
 import userRoutes from './user_data/route/userRoute.js';
 import './user_data/config/db.js';
 
+// Auth
+import authRoutes from './user_data/route/authRoute.js';
+
 const app = express();
 app.use(express.json());
 
@@ -30,6 +33,8 @@ app.get('/add/:num1-:num2',(req,res)=>{
 
 // Use the user routes
 app.use('/', userRoutes);
+
+app.use('/', authRoutes);
 
 export function startServer(){
     app.listen(80, () => {

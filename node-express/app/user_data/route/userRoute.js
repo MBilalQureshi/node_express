@@ -14,6 +14,6 @@ router.post("/login", login);
 
 //Post Routes
 router.post("/create/post", verifyToken, createPost);
-router.get("/get/posts", getAllPosts);
+router.get("/get/posts",verifyToken, getAllPosts);
 
 export default router;

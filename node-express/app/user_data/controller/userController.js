@@ -3,11 +3,16 @@ import validator from 'validator';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { ACCESS_TOKEN_SECRET } from '../../config/config.js';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../config/config.js';
 
 // Function to generate access token
 const generateAccessToken = (user) => {
-    return jwt.sign({ id: user._id, username: user.username }, ACCESS_TOKEN_SECRET, {expiresIn: '1h'});
+    return jwt.sign({ id: user._id, username: user.username }, ACCESS_TOKEN_SECRET, {expiresIn: '3m'});
+};
+
+// Function to generate refresh token
+const generateRefreshToken = (user) => {
+    return jwt.sign({ id: user._id, username: user.username }, REFRESH_TOKEN_SECRET, { expiresIn: '5m' });
 };
 
 // Trim spaces and remove extra spaces between words
@@ -117,9 +122,11 @@ export const login = async (req, res)=> {
         const validPassword = bcrypt.compare(password, user.password);
         if(!validPassword) return res.status(404).json({ message: 'Invalid username or password' });
 
-        // Generate access token
+        // Generate access and refresh token
         const accessToken = generateAccessToken(user);
-        res.status(200).json({ accessToken });
+        const refreshToken = generateRefreshToken(user);
+
+        res.status(200).json({ "access token":accessToken, "refresh token":refreshToken });
 
     }catch(err){
         res.status(500).json({ message: 'Invalid username or password' });
