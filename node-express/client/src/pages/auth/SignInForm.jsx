@@ -20,9 +20,10 @@ export function SignInForm() {
 
     try{
       const response = await axios.post('http://localhost:80/login',{
-        username: values.email,
+        usernameEmail: values.email,
         password: values.password
       });
+      console.log(response);
 
       if(response.status === 200){
         console.log('Sign-in successful');

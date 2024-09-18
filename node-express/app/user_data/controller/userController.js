@@ -112,11 +112,13 @@ const validatePassword = (password, res) => {
 
 // User Login
 export const login = async (req, res)=> {
-    const { username, password } = req.body;
+    const { usernameEmail, password } = req.body;
     try{
-        //validate username
-        const user = await User.findOne({ username });
-        console.log(user);
+        let username = '';
+        let email = '';
+        usernameEmail.includes('@') ? email = usernameEmail : username = usernameEmail;
+        //validate by username or email
+        const user = email ? await User.findOne({ email }) : await User.findOne({ username });
         if(!user) return res.status(404).json({ message: 'Invalid username or password111' });
         
         // validate password
