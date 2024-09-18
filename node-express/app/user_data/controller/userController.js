@@ -74,7 +74,9 @@ const validateAge = (age, res) => {
 
 // Convert age to number
 const convertAgeToNumber = (age) => {
-    if (age.length > 0) {
+    console.log(age);
+    if (age && age.length > 0) {
+        console.log("enter");
         return parseInt(age, 10);
     }
     return age;
@@ -119,7 +121,7 @@ export const login = async (req, res)=> {
         usernameEmail.includes('@') ? email = usernameEmail : username = usernameEmail;
         //validate by username or email
         const user = email ? await User.findOne({ email }) : await User.findOne({ username });
-        if(!user) return res.status(404).json({ message: 'Invalid username or password111' });
+        if(!user) return res.status(404).json({ message: 'Invalid username or password' });
         
         // validate password
         const validPassword = bcrypt.compare(password, user.password);
@@ -135,10 +137,10 @@ export const login = async (req, res)=> {
         res.status(500).json({ message: 'Invalid username or password' });
     }
 };
-// Create a new user
+// Create a new user/ sign up
 export const createUser = async (req, res) => {
     let { username, email, name, age, gender, password } = req.body;
-
+    console.log(age);
     // Destructuring assignment and mapping to trim and remove extra spaces
     [username, email, age, password] = [username, email, age.toString(), password].map(trimAndRemoveExtraSpaces); 
 
@@ -183,7 +185,12 @@ export const createUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         const newUser = new User({ username, email, name, age, gender, password: hashedPassword });
         await newUser.save();
-        res.status(201).json(newUser);
+
+        // Generate access and refresh tokens
+        const accessToken = generateAccessToken(newUser);
+        const refreshToken = generateRefreshToken(newUser);
+
+        res.status(201).json({ newUser, "access token":accessToken, "refresh token":refreshToken });
     }catch(err){
         res.status(500).json({
             message: `An error occurred while creating the user. Please try again later.${err.message}`,

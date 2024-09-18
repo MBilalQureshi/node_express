@@ -37,10 +37,10 @@ const userSchema = new mongoose.Schema({
         required: false,
         min: [1, 'Age must be at least 1'],
         max: [100, 'Age must be at most 100'],
-        validate: {
-            validator: Number.isInteger,
-            message: 'Age must be an integer'
-        },
+        // validate: {
+        //     validator: Number.isInteger,
+        //     message: 'Age must be a Number'
+        // },
     },
     gender: {
         type: String,
