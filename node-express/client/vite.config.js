@@ -8,6 +8,15 @@ export default defineConfig({
     'process.env': process.env
   },
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@tailwindConfig': path.resolve(__dirname, 'tailwind.config.js'),

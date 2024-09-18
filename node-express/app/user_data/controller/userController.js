@@ -7,12 +7,12 @@ import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../config/config.j
 
 // Function to generate access token
 const generateAccessToken = (user) => {
-    return jwt.sign({ id: user._id, username: user.username }, ACCESS_TOKEN_SECRET, {expiresIn: '3m'});
+    return jwt.sign({ id: user._id, username: user.username }, ACCESS_TOKEN_SECRET, {expiresIn: '10m'});
 };
 
 // Function to generate refresh token
 const generateRefreshToken = (user) => {
-    return jwt.sign({ id: user._id, username: user.username }, REFRESH_TOKEN_SECRET, { expiresIn: '5m' });
+    return jwt.sign({ id: user._id, username: user.username }, REFRESH_TOKEN_SECRET, { expiresIn: '20m' });
 };
 
 // Trim spaces and remove extra spaces between words
@@ -115,8 +115,9 @@ export const login = async (req, res)=> {
     const { username, password } = req.body;
     try{
         //validate username
-        const user = await User.findOne({ username});
-        if(!user) return res.status(404).json({ message: 'Invalid username or password' });
+        const user = await User.findOne({ username });
+        console.log(user);
+        if(!user) return res.status(404).json({ message: 'Invalid username or password111' });
         
         // validate password
         const validPassword = bcrypt.compare(password, user.password);
@@ -183,7 +184,7 @@ export const createUser = async (req, res) => {
         res.status(201).json(newUser);
     }catch(err){
         res.status(500).json({
-            message: `An error occurred while creating the user. Please try again later.`,
+            message: `An error occurred while creating the user. Please try again later.${err.message}`,
             status: false,
         });
     }

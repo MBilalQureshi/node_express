@@ -4,6 +4,7 @@ import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export function SignInForm() {
   const navigate = useNavigate();
@@ -11,25 +12,44 @@ export function SignInForm() {
   const [showAlert, setShowAlert] = useState(false);
   const togglePasswordVisibility = () => setPasswordShown((cur) => !cur);
 
-  const handleSubmit = (values, { setSubmitting }) => {
-    const storedEmail = localStorage.getItem('email');
-    const storedUsername = localStorage.getItem('username');
-    const storedPassword = localStorage.getItem('password');
+  const handleSubmit = async (values, { setSubmitting }) => {
+    // const storedEmail = localStorage.getItem('email');
+    // const storedUsername = localStorage.getItem('username');
+    // const storedPassword = localStorage.getItem('password');
+    //Use axios to validate the user credentials
 
-    if (
-      (values.email === storedEmail || values.email === storedUsername) &&
-      values.password === storedPassword
-    ) {
-      // Successful sign-in
-      console.log("Sign-in successful");
-      navigate('/');
-    } else {
-      // Sign-in failed
+    try{
+      const response = await axios.post('http://localhost:80/login',{
+        username: values.email,
+        password: values.password
+      });
+
+      if(response.status === 200){
+        console.log('Sign-in successful');
+        const {accessToken, refreshToken} = response.data;
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        navigate('/');
+      }
+    }catch(err){
       setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000); // Hide alert after 3 seconds
+      setTimeout(() => setShowAlert(false), 3000);
+      setSubmitting(false);
     }
+    // if (
+    //   (values.email === storedEmail || values.email === storedUsername) &&
+    //   values.password === storedPassword
+    // ) {
+    //   // Successful sign-in
+    //   console.log("Sign-in successful");
+    //   navigate('/');
+    // } else {
+    //   // Sign-in failed
+    //   setShowAlert(true);
+    //   setTimeout(() => setShowAlert(false), 3000); // Hide alert after 3 seconds
+    // }
 
-    setSubmitting(false);
+    // setSubmitting(false);
   };
 
   // Validation schema with Yup
