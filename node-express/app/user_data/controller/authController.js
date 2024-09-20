@@ -3,7 +3,7 @@ import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../config/config.j
 
 // Function to generate access token
 const generateAccessToken = (user) => {
-    return jwt.sign({ id: user.id, username: user.username }, ACCESS_TOKEN_SECRET, { expiresIn: '10m' });
+    return jwt.sign({ id: user.id, username: user.username }, ACCESS_TOKEN_SECRET, { expiresIn: '2m' });
 };
 
 // Refresh Token Endpoint

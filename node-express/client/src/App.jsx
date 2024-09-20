@@ -13,6 +13,7 @@ import './charts/ChartjsConfig';
 import Dashboard from './pages/Dashboard';
 import SignInForm from './pages/auth/SignInForm';
 import SignUpForm from './pages/auth/SignUpForm';
+import ValidateTokens from './components/ValidateTokens';
 
 function App() {
 
@@ -22,15 +23,17 @@ function App() {
     document.querySelector('html').style.scrollBehavior = 'auto'
     window.scroll({ top: 0 })
     document.querySelector('html').style.scrollBehavior = ''
-  }, [location.pathname]); // triggered on route change
+  }, [location.pathname]);
 
   return (
     <>
-      <Routes>
-        <Route exact path="/" element={<Dashboard />} />
-        <Route path="/signin" element={<SignInForm />} />
-        <Route path="/signup" element={<SignUpForm />} />
-      </Routes>
+      <ValidateTokens>
+        <Routes>
+          <Route exact path="/" element={<Dashboard />} />
+          <Route path="/signin" element={<SignInForm />} />
+          <Route path="/signup" element={<SignUpForm />} />
+        </Routes>
+      </ValidateTokens>
     </>
   );
 }
