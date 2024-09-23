@@ -4,7 +4,7 @@ import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../interceptors/axiosInstance.js';
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const SignUpForm = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post('http://localhost:80/create/user', values);
+      const response = await axiosInstance.post('http://localhost:80/create/user', values);
 
       if (response.status === 201) {
         console.log('Sign-up successful');

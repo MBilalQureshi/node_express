@@ -4,7 +4,7 @@ import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/solid";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../interceptors/axiosInstance.js';
 
 export function SignInForm() {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export function SignInForm() {
     //Use axios to validate the user credentials
 
     try{
-      const response = await axios.post('http://localhost:80/login',{
+      const response = await axiosInstance.post('http://localhost:80/login',{
         usernameEmail: values.email,
         password: values.password
       });
